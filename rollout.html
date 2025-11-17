@@ -158,6 +158,9 @@
       left: 0;
       z-index: 1;
       background: #020617;
+      min-width: 68px;
+      width: 68px;
+      white-space: normal;
     }
     td {
       background: rgba(15, 23, 42, 0.9);
@@ -525,7 +528,7 @@
         return;
       }
 
-      const spurRange = 5;
+      const spurRange = 3;
       const pinionRange = 5;
 
       createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange);
@@ -672,4 +675,3 @@
   </script>
 </body>
 </html>
-
