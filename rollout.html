@@ -456,7 +456,7 @@
 
           const td = document.createElement("td");
           td.innerHTML =
-            `<span class="rollout-sae">${rolloutInches.toFixed(2)} in</span><br>` +
+            `<span class="rollout-sae">${rolloutInches.toFixed(3)} in</span><br>` +
             `<span class="rollout-metric">${rolloutMm.toFixed(1)} mm</span>`;
 
           if (pinion === pinionStart && spur === spurStart) {
@@ -675,3 +675,4 @@
   </script>
 </body>
 </html>
+
