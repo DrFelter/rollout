@@ -143,13 +143,21 @@
       font-weight: 600;
       color: #d1d5db;
     }
+
+    /* Make the pinion column narrower on small screens */
     th.sticky-left,
     td.sticky-left {
       position: sticky;
       left: 0;
       z-index: 1;
       background: #020617;
+      min-width: 52px;
+      max-width: 60px;
+      padding-left: 4px;
+      padding-right: 4px;
+      font-size: 0.72rem;
     }
+
     td {
       background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb;
@@ -158,6 +166,13 @@
       background: radial-gradient(circle at top left, #16a34a, #14532d);
       color: #ecfdf5;
       font-weight: 600;
+    }
+
+    /* Yellow border for the exact selected spur/pinion combo */
+    td.selected-cell {
+      box-shadow: 0 0 0 2px #facc15 inset;
+      border-color: #facc15 !important;
+      position: relative;
     }
 
     .unit-note {
@@ -283,11 +298,11 @@
             id="tireDiameter"
             type="number"
             step="0.1"
-            value="41.3"
+            value="46"
             required
           />
           <div class="help-text">
-            Auto-detects units
+            Auto-detects unit: ≤ 3 = inches (SAE), &gt; 3 = mm (metric).
           </div>
         </div>
 
@@ -418,6 +433,11 @@
             td.classList.add("highlight");
           }
 
+          // Yellow border for *exact* selected pinion/spur
+          if (spur === spurStart && pinion === pinionStart) {
+            td.classList.add("selected-cell");
+          }
+
           row.appendChild(td);
         });
 
@@ -469,8 +489,7 @@
       const pinionStart = parseInt(document.getElementById("pinionStart").value, 10);
 
       if (!tireValue || tireValue <= 0 || !spurStart || !pinionStart) {
-        // Don't show alerts on live updates; just avoid crashing
-        return;
+        return; // avoid errors during partial edits
       }
 
       const spurRange = 5;
@@ -556,7 +575,7 @@
           if (d < bestDiff) {
             bestDiff = d;
             nearestIdx = i;
-          }
+            }
         });
         startIndex = nearestIdx;
       }
