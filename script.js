@@ -146,7 +146,8 @@ function updateGrid() {
     return;
   }
 
-  const spurRange = 3;
+  const isSmallScreen = window.matchMedia("(max-width: 480px)").matches;
+  const spurRange = isSmallScreen ? 1 : 3;
   const pinionRange = 5;
 
   createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange);
