@@ -38,18 +38,31 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
 
   const table = document.createElement("table");
 
-  // Header row
+  // Header rows
   const thead = document.createElement("thead");
-  const headerRow = document.createElement("tr");
+  const topHeaderRow = document.createElement("tr");
+  const topCorner = document.createElement("th");
+  topCorner.classList.add("sticky-left");
+  topCorner.innerText = "";
+  topHeaderRow.appendChild(topCorner);
+  const spurLabel = document.createElement("th");
+  spurLabel.colSpan = spurValues.length;
+  spurLabel.innerText = "Spur Gear";
+  topHeaderRow.appendChild(spurLabel);
+  thead.appendChild(topHeaderRow);
 
+  const headerRow = document.createElement("tr");
   const cornerTh = document.createElement("th");
   cornerTh.classList.add("sticky-left");
-  cornerTh.innerText = "Pinion (rows) / Spur (cols)";
+  cornerTh.innerText = "Pinion";
   headerRow.appendChild(cornerTh);
 
   spurValues.forEach((spur) => {
     const th = document.createElement("th");
     th.innerText = spur + "T";
+    if (spur === spurStart) {
+      th.classList.add("selected-spur-header");
+    }
     headerRow.appendChild(th);
   });
 
@@ -64,6 +77,9 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
     const rowHeader = document.createElement("th");
     rowHeader.classList.add("sticky-left");
     rowHeader.innerText = pinion + "T";
+    if (pinion === pinionStart) {
+      rowHeader.classList.add("selected-pinion-header");
+    }
     row.appendChild(rowHeader);
 
     spurValues.forEach((spur) => {
@@ -128,10 +144,65 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
   gridContainer.appendChild(table);
   gridContainer.style.display = "block";
 
+  // Keep header widths aligned with body cells across narrow viewports
+  syncHeaderWidths(table);
+
   unitNote.textContent =
     unit === "inch"
       ? `Detected tire unit: inches (SAE). Metric values are converted from inches.`
       : `Detected tire unit: millimeters (metric). SAE values are converted from mm.`;
+
+  // Center the view on the currently selected spur/pinion combo
+  const selectedCell = table.querySelector(".selected-gear");
+  if (selectedCell) {
+    const cellRect = selectedCell.getBoundingClientRect();
+    const containerRect = gridContainer.getBoundingClientRect();
+    const targetLeft =
+      gridContainer.scrollLeft +
+      (cellRect.left - containerRect.left) -
+      (containerRect.width / 2 - cellRect.width / 2);
+    const targetTop =
+      gridContainer.scrollTop +
+      (cellRect.top - containerRect.top) -
+      (containerRect.height / 2 - cellRect.height / 2);
+
+    gridContainer.scrollTo({
+      left: Math.max(0, targetLeft),
+      top: Math.max(0, targetTop),
+      behavior: "smooth",
+    });
+  }
+}
+
+function syncHeaderWidths(table) {
+  const thead = table.querySelector("thead");
+  const firstBodyRow = table.querySelector("tbody tr");
+  if (!thead || !firstBodyRow) return;
+
+  const bodyCells = Array.from(firstBodyRow.children);
+  const headerRows = thead.querySelectorAll("tr");
+  if (headerRows.length < 2) return;
+
+  const topHeaderRow = headerRows[0];
+  const spurHeaderRow = headerRows[1];
+
+  const cornerWidth = bodyCells[0].getBoundingClientRect().width;
+  [topHeaderRow.children[0], spurHeaderRow.children[0]].forEach((cell) => {
+    if (cell) cell.style.width = `${cornerWidth}px`;
+  });
+
+  let spurTotal = 0;
+  for (let i = 1; i < bodyCells.length; i++) {
+    const w = bodyCells[i].getBoundingClientRect().width;
+    spurTotal += w;
+    const headerCell = spurHeaderRow.children[i];
+    if (headerCell) headerCell.style.width = `${w}px`;
+  }
+
+  const spurLabelCell = topHeaderRow.children[1];
+  if (spurLabelCell) {
+    spurLabelCell.style.width = `${spurTotal}px`;
+  }
 }
 
 // Central function: read inputs & rebuild grid
@@ -290,6 +361,7 @@ window.addEventListener("load", () => {
   // Live updates from car + tire fields
   document.getElementById("car").addEventListener("change", updateGrid);
   document.getElementById("tireDiameter").addEventListener("input", updateGrid);
+  window.addEventListener("resize", updateGrid);
 
   // Initial grid
   updateGrid();

@@ -179,6 +179,16 @@ td.selected-gear {
     inset 0 0 0 2px #facc15,
     0 0 12px rgba(250, 204, 21, 0.5);
 }
+.selected-spur-header {
+  box-shadow:
+    inset 0 -2px 0 #facc15,
+    0 4px 10px rgba(250, 204, 21, 0.35);
+}
+.selected-pinion-header {
+  box-shadow:
+    inset -2px 0 0 #facc15,
+    4px 0 10px rgba(250, 204, 21, 0.35);
+}
 
 .unit-note {
   margin-top: 4px;
@@ -299,5 +309,27 @@ td.selected-gear {
   }
   .wheel-item {
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    min-width: auto;
+    width: 100%;
+    table-layout: fixed;
+  }
+  th,
+  td {
+    padding: 4px 4px;
+    font-size: 0.68rem;
+  }
+  th.sticky-left,
+  td.sticky-left {
+    min-width: 56px;
+    width: 56px;
+    white-space: nowrap;
+  }
+  .grid-wrapper {
+    overflow-x: hidden;
   }
 }
