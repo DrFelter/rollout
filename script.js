@@ -347,7 +347,7 @@ window.addEventListener("load", () => {
 
   // Ranges (tweak as needed)
   const pinionValues = [];
-  for (let v = 30; v <= 80; v++) {
+  for (let v = 10; v <= 80; v++) {
     pinionValues.push(v);
   }
   const spurValues = [];
