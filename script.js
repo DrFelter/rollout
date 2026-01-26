@@ -1,7 +1,8 @@
 const carConfigs = {
   A12: { lowMin: 112, lowMax: 125 },
   A12x: { lowMin: 113, lowMax: 120 },
-  Metriks: { lowMin: 106, lowMax: 115 }
+  Metriks64: { lowMin: 106, lowMax: 115 },
+  Metriks48: { lowMin: 80, lowMax: 88 }
 };
 
 const gridContainer = document.getElementById("gridContainer");
