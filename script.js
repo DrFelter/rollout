@@ -2,7 +2,7 @@ const carConfigs = {
   A12: { lowMin: 112, lowMax: 125 },
   A12x: { lowMin: 113, lowMax: 120 },
   Metriks64: { lowMin: 106, lowMax: 115 },
-  Metriks48: { lowMin: 80, lowMax: 88 }
+  Metriks48: { lowMin: 80, lowMax: 94 }
 };
 
 const gridContainer = document.getElementById("gridContainer");
@@ -351,7 +351,7 @@ window.addEventListener("load", () => {
     pinionValues.push(v);
   }
   const spurValues = [];
-  for (let v = 60; v <= 90; v++) {
+  for (let v = 40; v <= 90; v++) {
     spurValues.push(v);
   }
 
