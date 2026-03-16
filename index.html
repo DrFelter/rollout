@@ -39,7 +39,7 @@
             required
           />
           <div class="help-text">
-            Auto-detects units
+            Auto detect units
           </div>
         </div>
 
@@ -77,9 +77,15 @@
             value="66"
           />
         </div>
+        <div class="field tolerance-field">
+          <label for="tolerance">Near-Match Tolerance</label>
+          <input id="tolerance" type="number" step="0.001" value="0.040" />
+          <div class="help-text" id="toleranceUnit">Auto detect units</div>
+        </div>
       </form>
 
       <div id="unitNote" class="unit-note"></div>
+      <div id="rolloutInfo" class="rollout-info"></div>
 
       <div id="gridContainer" class="grid-wrapper" style="display: none;"></div>
     </div>

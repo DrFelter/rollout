@@ -7,6 +7,7 @@ const carConfigs = {
 
 const gridContainer = document.getElementById("gridContainer");
 const unitNote = document.getElementById("unitNote");
+const rolloutInfo = document.getElementById("rolloutInfo");
 
 function detectUnit(value) {
   // Heuristic: <= 3 means inches, otherwise millimeters
@@ -14,7 +15,7 @@ function detectUnit(value) {
   return "mm";
 }
 
-function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange) {
+function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange, toleranceInches) {
   const unit = detectUnit(tireValue);
   let tireInches, tireMm;
 
@@ -36,6 +37,10 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
   for (let p = pinionStart - pinionRange; p <= pinionStart + pinionRange; p++) {
     if (p > 0) pinionValues.push(p);
   }
+
+  const selectedRolloutInches = Math.PI * tireInches / (spurStart / pinionStart);
+  const selectedRolloutMm = Math.PI * tireMm / (spurStart / pinionStart);
+  let nearMatchCount = 0;
 
   const table = document.createElement("table");
 
@@ -89,17 +94,21 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
       const rolloutMm = Math.PI * tireMm / ratio;
       const totalTeeth = spur + pinion; // used only for highlighting
 
+      const isSelected = pinion === pinionStart && spur === spurStart;
+      const inPreferredRange = totalTeeth >= config.lowMin && totalTeeth <= config.lowMax;
+      const isNearMatch = !isSelected && inPreferredRange && Math.abs(rolloutInches - selectedRolloutInches) <= toleranceInches;
+      if (isNearMatch) nearMatchCount++;
+
       const td = document.createElement("td");
       td.innerHTML =
-        `<span class="rollout-sae">${rolloutInches.toFixed(3)} in</span><br>` +
-        `<span class="rollout-metric">${rolloutMm.toFixed(1)} mm</span>`;
+        `<span class="rollout-sae${isNearMatch ? " near-match" : ""}">${rolloutInches.toFixed(3)} in</span><br>` +
+        `<span class="rollout-metric${isNearMatch ? " near-match" : ""}">${rolloutMm.toFixed(1)} mm</span>`;
 
-      if (pinion === pinionStart && spur === spurStart) {
+      if (isSelected) {
         td.classList.add("selected-gear");
       }
 
-      // Highlight based on combined tooth count
-      if (totalTeeth >= config.lowMin && totalTeeth <= config.lowMax) {
+      if (inPreferredRange) {
         td.classList.add("highlight");
       }
 
@@ -141,6 +150,13 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
   pill2.appendChild(label2);
   legend.appendChild(pill2);
 
+  const pill3 = document.createElement("div");
+  pill3.classList.add("legend-pill");
+  const label3 = document.createElement("span");
+  label3.innerHTML = `<span class="rollout-sae near-match">Yellow text</span> = within tolerance &amp; preferred range`;
+  pill3.appendChild(label3);
+  legend.appendChild(pill3);
+
   gridContainer.appendChild(legend);
   gridContainer.appendChild(table);
   gridContainer.style.display = "block";
@@ -152,6 +168,14 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
     unit === "inch"
       ? `Detected tire unit: inches (SAE). Metric values are converted from inches.`
       : `Detected tire unit: millimeters (metric). SAE values are converted from mm.`;
+
+  const tolDisplay = unit === "inch"
+    ? `±${toleranceInches.toFixed(3)} in`
+    : `±${(toleranceInches * 25.4).toFixed(2)} mm`;
+  rolloutInfo.innerHTML =
+    `Selected rollout: <span class="rollout-selected-value">${selectedRolloutInches.toFixed(3)} in / ${selectedRolloutMm.toFixed(1)} mm</span>` +
+    `&nbsp;&nbsp;|&nbsp;&nbsp;${nearMatchCount} near match${nearMatchCount !== 1 ? "es" : ""} (${tolDisplay}, preferred range only)`;
+  rolloutInfo.classList.add("visible");
 
   // Center the view on the currently selected spur/pinion combo
   const selectedCell = table.querySelector(".selected-gear");
@@ -214,15 +238,22 @@ function updateGrid() {
   const pinionStart = parseInt(document.getElementById("pinionStart").value, 10);
 
   if (!tireValue || tireValue <= 0 || !spurStart || !pinionStart) {
-    // Don't show alerts on live updates; just avoid crashing
     return;
   }
+
+  const toleranceInput = document.getElementById("tolerance");
+  const toleranceUnitLabel = document.getElementById("toleranceUnit");
+
+  const toleranceRaw = parseFloat(toleranceInput.value) || 0;
+  const toleranceUnit = toleranceRaw <= 1 ? "inch" : "mm";
+  const toleranceInches = toleranceUnit === "inch" ? toleranceRaw : toleranceRaw / 25.4;
+  toleranceUnitLabel.textContent = "Auto detect units";
 
   const isSmallScreen = window.matchMedia("(max-width: 480px)").matches;
   const spurRange = isSmallScreen ? 1 : 3;
   const pinionRange = 5;
 
-  createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange);
+  createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange, toleranceInches);
 }
 
 /**
@@ -362,6 +393,7 @@ window.addEventListener("load", () => {
   // Live updates from car + tire fields
   document.getElementById("car").addEventListener("change", updateGrid);
   document.getElementById("tireDiameter").addEventListener("input", updateGrid);
+  document.getElementById("tolerance").addEventListener("input", updateGrid);
   window.addEventListener("resize", updateGrid);
 
   // Initial grid
