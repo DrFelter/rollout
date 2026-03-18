@@ -6,7 +6,6 @@ const carConfigs = {
 };
 
 const gridContainer = document.getElementById("gridContainer");
-const unitNote = document.getElementById("unitNote");
 const rolloutInfo = document.getElementById("rolloutInfo");
 
 function detectUnit(value) {
@@ -15,7 +14,7 @@ function detectUnit(value) {
   return "mm";
 }
 
-function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange, toleranceInches) {
+function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange, toleranceInches, toleranceUnit) {
   const unit = detectUnit(tireValue);
   let tireInches, tireMm;
 
@@ -164,10 +163,14 @@ function createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRan
   // Keep header widths aligned with body cells across narrow viewports
   syncHeaderWidths(table);
 
-  unitNote.textContent =
-    unit === "inch"
-      ? `Detected tire unit: inches (SAE). Metric values are converted from inches.`
-      : `Detected tire unit: millimeters (metric). SAE values are converted from mm.`;
+  document.getElementById("tireUnit").textContent =
+    unit === "inch" ? "Auto detect units (inches)" : "Auto detect units (mm)";
+
+  const isToleranceInches = toleranceUnit === "inch";
+  const toleranceText = isToleranceInches
+    ? "Auto detect units (inches)"
+    : "Auto detect units (mm)";
+  document.getElementById("toleranceUnit").textContent = toleranceText;
 
   const tolDisplay = unit === "inch"
     ? `±${toleranceInches.toFixed(3)} in`
@@ -242,18 +245,25 @@ function updateGrid() {
   }
 
   const toleranceInput = document.getElementById("tolerance");
-  const toleranceUnitLabel = document.getElementById("toleranceUnit");
 
   const toleranceRaw = parseFloat(toleranceInput.value) || 0;
   const toleranceUnit = toleranceRaw <= 1 ? "inch" : "mm";
   const toleranceInches = toleranceUnit === "inch" ? toleranceRaw : toleranceRaw / 25.4;
-  toleranceUnitLabel.textContent = "Auto detect units";
 
   const isSmallScreen = window.matchMedia("(max-width: 480px)").matches;
   const spurRange = isSmallScreen ? 1 : 3;
   const pinionRange = 5;
 
-  createGrid(car, tireValue, spurStart, pinionStart, spurRange, pinionRange, toleranceInches);
+  createGrid(
+    car,
+    tireValue,
+    spurStart,
+    pinionStart,
+    spurRange,
+    pinionRange,
+    toleranceInches,
+    toleranceUnit
+  );
 }
 
 /**

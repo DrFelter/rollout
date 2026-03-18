@@ -19,8 +19,8 @@
         <div class="field">
           <label for="car">Car</label>
           <select id="car">
-            <option value="A12">Awesomatix A12</option>
-            <option value="A12x" selected>Awesomatix A12x</option>
+            <option value="A12">A12</option>
+            <option value="A12x" selected>A12x</option>
             <option value="Metriks48">Metriks 48dp</option>
             <option value="Metriks64">Metriks 64dp </option>
           </select>
@@ -38,14 +38,14 @@
             value="1.580"
             required
           />
-          <div class="help-text">
+          <div class="help-text" id="tireUnit">
             Auto detect units
           </div>
         </div>
 
         <!-- Row 2: Pinion | Spur -->
         <div class="field">
-          <label for="pinionStart">Pinion Teeth</label>
+          <label>Pinion Teeth</label>
 
           <!-- Wheel for Pinion -->
           <div class="wheel" id="pinionWheel">
@@ -62,7 +62,7 @@
         </div>
 
         <div class="field">
-          <label for="spurStart">Spur Teeth</label>
+          <label>Spur Teeth</label>
 
           <!-- Wheel for Spur -->
           <div class="wheel" id="spurWheel">
@@ -84,7 +84,6 @@
         </div>
       </form>
 
-      <div id="unitNote" class="unit-note"></div>
       <div id="rolloutInfo" class="rollout-info"></div>
 
       <div id="gridContainer" class="grid-wrapper" style="display: none;"></div>

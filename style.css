@@ -39,7 +39,7 @@ h1 {
 /* Form layout: 2 columns -> Car | Tire, Pinion | Spur */
 form {
   display: grid;
-  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  grid-template-columns: calc(50% - 8px) calc(50% - 8px);
   gap: 16px;
   margin-bottom: 20px;
   align-items: flex-end;
@@ -49,12 +49,15 @@ form {
   flex-direction: column;
   gap: 4px;
   font-size: 0.9rem;
+  min-width: 0;
 }
 label {
   color: #e5e7eb;
 }
 select,
 input[type="number"] {
+  width: 100%;
+  min-width: 0;
   border-radius: 999px;
   border: 1px solid #4b5563;
   background: rgba(15, 23, 42, 0.85);
@@ -303,6 +306,10 @@ td.selected-gear .rollout-sae {
 }
 
 @media (max-width: 640px) {
+  .table-note,
+  .legend {
+    display: none;
+  }
   body {
     padding: 12px;
   }
@@ -316,7 +323,7 @@ td.selected-gear .rollout-sae {
     font-size: 1.25rem;
   }
   form {
-    grid-template-columns: 1fr; /* stack on small screens */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
   select,
